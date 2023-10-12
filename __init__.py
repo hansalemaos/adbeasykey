@@ -83,6 +83,96 @@ class PressKey:
             **kwargs,
         )
 
+    def dpad(self, *args, **kwargs):
+        return self.fu(
+            self.adb_path,
+            self.device_serial,
+            f"input dpad keyevent {self.event}{self.longpress}",
+            *args,
+            **kwargs,
+        )
+
+    def keyboard(self, *args, **kwargs):
+        return self.fu(
+            self.adb_path,
+            self.device_serial,
+            f"input keyboard keyevent {self.event}{self.longpress}",
+            *args,
+            **kwargs,
+        )
+
+    def mouse(self, *args, **kwargs):
+        return self.fu(
+            self.adb_path,
+            self.device_serial,
+            f"input mouse keyevent {self.event}{self.longpress}",
+            *args,
+            **kwargs,
+        )
+
+    def touchpad(self, *args, **kwargs):
+        return self.fu(
+            self.adb_path,
+            self.device_serial,
+            f"input touchpad keyevent {self.event}{self.longpress}",
+            *args,
+            **kwargs,
+        )
+
+    def gamepad(self, *args, **kwargs):
+        return self.fu(
+            self.adb_path,
+            self.device_serial,
+            f"input gamepad keyevent {self.event}{self.longpress}",
+            *args,
+            **kwargs,
+        )
+
+    def touchnavigation(self, *args, **kwargs):
+        return self.fu(
+            self.adb_path,
+            self.device_serial,
+            f"input touchnavigation keyevent {self.event}{self.longpress}",
+            *args,
+            **kwargs,
+        )
+
+    def joystick(self, *args, **kwargs):
+        return self.fu(
+            self.adb_path,
+            self.device_serial,
+            f"input joystick keyevent {self.event}{self.longpress}",
+            *args,
+            **kwargs,
+        )
+
+    def touchscreen(self, *args, **kwargs):
+        return self.fu(
+            self.adb_path,
+            self.device_serial,
+            f"input touchscreen keyevent {self.event}{self.longpress}",
+            *args,
+            **kwargs,
+        )
+
+    def stylus(self, *args, **kwargs):
+        return self.fu(
+            self.adb_path,
+            self.device_serial,
+            f"input stylus keyevent {self.event}{self.longpress}",
+            *args,
+            **kwargs,
+        )
+
+    def trackball(self, *args, **kwargs):
+        return self.fu(
+            self.adb_path,
+            self.device_serial,
+            f"input trackball keyevent {self.event}{self.longpress}",
+            *args,
+            **kwargs,
+        )
+
 
 module_cfg.key_events = {
     "ACTION_DOWN": {

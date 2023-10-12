@@ -27,7 +27,9 @@ adb.keyevents.KEYCODE_A.longpress_ps()
 adb.input_text_ps(text)  # doesn't preserve accents
 adb.input_text_ps(text, remove_accents=True)  # ç -> c
 adb.input_text_ps(text, sleeptime=(0.1, 0.2), remove_accents=True) # one by one
-
+adb.input_text_ps(text, sleeptime=(0.1, 0.2), remove_accents=True, input_device='keyboard') 
+adb.keyevents.KEYCODE_A.longpress_ps.gamepad()
+adb.keyevents.KEYCODE_A.longpress_ps.keyboard()
 adb.input_text_subprocess(text)  # doesn't preserve accents
 adb.input_text_subprocess(text, remove_accents=True)  # ç -> c
 adb.input_text_subprocess(text, sleeptime=(0.1, 0.2), remove_accents=True)
