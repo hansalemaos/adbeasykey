@@ -10,6 +10,8 @@ import tempfile
 import time
 from copy import deepcopy
 from functools import partial
+from typing import Literal
+
 from kthread_sleep import sleep
 
 import kthread
@@ -39,6 +41,20 @@ module_cfg.ADB_SELECTED_INPUT_METHOD = (
 module_cfg.ADB_SHOW_IME_WITH_HARD_KEYBOARD = (
     f"cmd settings put secure show_ime_with_hard_keyboard 1"
 )
+
+valid_input_devices = Literal[
+    "dpad",
+    "keyboard",
+    "mouse",
+    "touchpad",
+    "gamepad",
+    "touchnavigation",
+    "joystick",
+    "touchscreen",
+    "stylus",
+    "trackball",
+    "",
+]
 
 
 class PressKey:
@@ -2628,7 +2644,6 @@ def _format_command(
         exit_b = b""
     nolimitcommand_no_bytes = " ".join(nolimitcommand) + exit_u
     nolimitcommand_bytes = " ".join(nolimitcommand).encode("utf-8", errors) + exit_b
-    # print(f"{nolimitcommand_bytes, nolimitcommand_no_bytes, wholecommand=}")
     return nolimitcommand_no_bytes, nolimitcommand_bytes, wholecommand
 
 
@@ -2670,6 +2685,14 @@ def sleep_random_time(sleep_after_letter):
         sleep(random.uniform(*sleep_after_letter))
 
 
+def format_input_command(input_device, action, command):
+    if input_device:
+        cmd2send = f"input {input_device} {action} {command}"
+    else:
+        cmd2send = f"input {action} {command}"
+    return cmd2send
+
+
 def input_text_subprocess(
     adbpath,
     serial_number,
@@ -2684,6 +2707,8 @@ def input_text_subprocess(
     print_stdout=False,
     print_stderr=True,
     decode_stdout_print=True,
+    input_device: valid_input_devices = "",
+    **kwargs,
 ):
     if remove_accents:
         text = remove_accents_from_text(text)
@@ -2691,10 +2716,12 @@ def input_text_subprocess(
     stderrlist = []
     splitext = split_text_in_chars_or_parts(text, sleep_after_letter)
     for c in splitext:
+        cmd2send = format_input_command(input_device, action="text", command=c)
+
         nolimitcommand_no_bytes, nolimitcommand_bytes, wholecommand = _format_command(
             adbpath,
             serial_number,
-            f"input text {c}",
+            cmd2send,
             su=su,
             use_busybox=use_busybox,
             errors=errors,
@@ -2757,6 +2784,7 @@ def input_text_ps(
     print_stdout=False,
     print_stderr=True,
     decode_stdout_print=True,
+    input_device: valid_input_devices = "",
     **kwargs,
 ):
     if remove_accents:
@@ -2765,10 +2793,12 @@ def input_text_ps(
     stderrlist = []
     splitext = split_text_in_chars_or_parts(text, sleep_after_letter)
     for c in splitext:
+        cmd2send = format_input_command(input_device, action="text", command=c)
+
         stdout, stderr = adb_shell_ps(
             adbpath,
             serial_number,
-            cmd=f"input text {c}",
+            cmd=cmd2send,
             timeout=0,
             sleeptime=0,
             su=su,
@@ -2992,7 +3022,6 @@ def format_adb_command(cmd):
             "\n",
             "\r",
             " ",
-            "'",
         ),
     )
 
@@ -3090,7 +3119,6 @@ def adb_ps(
     if to_83:
         cmd = format_adb_command(cmd)
     wholecommand = [f"{adbpath}", "-s", f"{serial_number}" f" {cmd.lstrip()}"]
-    print(wholecommand)
     p = DetachedPopen(
         args=wholecommand,
         bufsize=-1,
@@ -3590,7 +3618,12 @@ class AdbEasyKey:
         )
 
     def input_text_subprocess(
-        self, text, remove_accents=False, sleeptime=(0, 0), add_exit=True
+        self,
+        text,
+        remove_accents=False,
+        sleeptime=(0, 0),
+        add_exit=True,
+        input_device: valid_input_devices = "",
     ):
         return input_text_subprocess(
             self.adbpath,
@@ -3603,10 +3636,16 @@ class AdbEasyKey:
             add_exit=add_exit,
             remove_accents=remove_accents,
             sleep_after_letter=sleeptime,
+            input_device=input_device,
         )
 
     def input_text_ps(
-        self, text, remove_accents=False, sleeptime=(0, 0), add_exit=True
+        self,
+        text,
+        remove_accents=False,
+        sleeptime=(0, 0),
+        add_exit=True,
+        input_device: valid_input_devices = "",
     ):
         return input_text_ps(
             self.adbpath,
@@ -3619,6 +3658,7 @@ class AdbEasyKey:
             add_exit=add_exit,
             remove_accents=remove_accents,
             sleep_after_letter=sleeptime,
+            input_device=input_device,
         )
 
     def adb_shell_subprocess(
